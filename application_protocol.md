@@ -10,7 +10,7 @@ Le port qu'il utilise est le numéro de port 16447.
 
 Le protocole de l'application "No-Tion" est un protocole de transport de texte où chaque message doit être encodé en UTF-8 et délimité par un caractère de nouvelle ligne (`\n`).
 
-Chaque paramètre d'une commande doit être mis entre guillemets doubles (`"`).
+Les paramètres composés d'espaces doivent être mis entre guillemets doubles (`"`).
 
 Les messages sont traités comme des messages textuels.
 
