@@ -1,0 +1,42 @@
+@startuml no-tion-scenario-3
+
+title "Scénario 3 : Gestion d'erreurs et corrections"
+
+participant "Client" as c
+participant "Server" as s
+
+== Connexion ==
+
+c->s : CONNECT Alice
+s->c : OK
+
+== Tentative de récupération d'une note inexistante ==
+
+c->s : GET_NOTE 5
+s->c : ERROR -1 (not found)
+
+== Création d'une nouvelle note ==
+
+c->s : CREATE_NOTE ShoppingList
+s->c : OK
+
+== Conflit lors de la création d'une note ==
+
+c->s : CREATE_NOTE ShoppingList
+s->c : ERROR -2 (conflict)
+
+== Correction : création d'une autre note ==
+
+c->s : CREATE_NOTE WeeklyMenu
+s->c : OK
+
+== Déconnexion ==
+
+note over c, s
+Le client informe le serveur qu'il souhaite se déconnecter.
+Le serveur ferme alors la connexion.
+end note
+
+c->s : DISCONNECT
+
+@enduml
