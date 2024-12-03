@@ -26,11 +26,11 @@ Sur un message inconnu, le serveur doit renvoyer un message d'erreur au client.
 ## Messages
 
 ### Connexion
-Le client envoie une commande de connexion au serveur pour s'authentifier.
+Le client envoie une commande de connexion au serveur pour s'authentifier avec son nom d'utilisateur.
 
 #### Requête
 ```text
-CONNECT
+CONNECT <name>
 ```
 
 #### Réponse
@@ -47,18 +47,15 @@ DISCONNECT
 ```
 
 #### Réponse
-```text
-OK
-```
+None.
 
 ### Création d'une note
 Le client envoie une commande de création de note au serveur.
+Pour simplifier le code, le client devra d'abord créer une note, puis la modifier pour ajouter le contenu.
 
 #### Requête
 ```text
-CREATE_NOTE
-Titre de la note
-Contenu de la note
+CREATE_NOTE <titre>
 ```
 
 #### Réponse
@@ -71,8 +68,7 @@ Le client envoie une commande de suppression de note au serveur.
 
 #### Requête
 ```text
-DELETE_NOTE
-Titre de la note
+DELETE_NOTE <titre>
 ```
 
 #### Réponse
@@ -90,11 +86,10 @@ LIST_NOTES
 
 #### Réponse
 ```text
-Titre de la note 1
-Contenu de la note 1
-Titre de la note 2
-Contenu de la note 2
+1 <titre de la note 1>
+2 <titre de la note 2>
 ...
+n <titre de la note n>
 ```
 
 ### Récupération d'une note
@@ -102,23 +97,20 @@ Le client envoie une commande pour récupérer une note au serveur.
 
 #### Requête
 ```text
-GEt_NOTE
-Titre de la note
+GET_NOTE <index>
 ```
 
 #### Réponse
 ```text
-Contenu de la note
+NOTE <contenu>
 ```
 
-### Modification d'une note
+### Modification du contenu d'une note
 Le client envoie une commande pour modifier une note au serveur.
 
 #### Requête
 ```text
-UPDATE_NOTE
-Titre de la note
-Nouveau contenu de la note
+UPDATE_CONTENT <index> <nouveau contenu>
 ```
 
 #### Réponse
@@ -126,28 +118,32 @@ Nouveau contenu de la note
 OK
 ```
 
+### Modification du titre d'une note
+Le client envoie une commande pour modifier le titre d'une note au serveur.
+
+#### Requête
+```text
+UPDATE_TITLE <index> <nouveau titre>
+```
+
+#### Réponse
+```text
+OK
+```
+
+
 ### Erreur
-Le serveur envoie un message d'erreur au client.
+Le serveur envoie un message d'erreur au client si une des requêtes est invalide.
 
 #### Réponse
 ```text
 ERROR <code>
 ```
 
-// TODO : réduire les erreurs
 Les codes d'erreur sont les suivants :
-- 1 : la note n'existe pas
-- 2 : la note existe déjà
-- 3 : erreur inconnue
-- 4 : commande inconnue
-- 5 : erreur de syntaxe
-- 6 : erreur de connexion
-- 7 : erreur de déconnexion
-- 8 : erreur de création de note
-- 9 : erreur de suppression de note
-- 10 : erreur de récupération de note
-- 11 : erreur de modification de note
-- 12 : erreur de liste des notes
+- -1 : not found (Note inexistante)
+- -2 : conflict (Note déjà existante)
+- -3 : syntax error (Commande inconnue ou incorrecte)
 
 // TODO : implémenter
 ## Exemples
