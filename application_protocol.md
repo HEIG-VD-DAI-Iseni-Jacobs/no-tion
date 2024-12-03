@@ -10,6 +10,8 @@ Le port qu'il utilise est le numéro de port 16447.
 
 Le protocole de l'application "No-Tion" est un protocole de transport de texte où chaque message doit être encodé en UTF-8 et délimité par un caractère de nouvelle ligne (`\n`).
 
+Chaque paramètre d'une commande doit être mis entre guillemets doubles (`"`).
+
 Les messages sont traités comme des messages textuels.
 
 La connexion initiale doit être établie par le client.
@@ -22,7 +24,6 @@ Si une commande est invalide, le serveur doit renvoyer un message d'erreur au cl
 
 Sur un message inconnu, le serveur doit renvoyer un message d'erreur au client.
 
-// TODO : relire et corriger
 ## Messages
 
 ### Connexion
@@ -145,6 +146,19 @@ Les codes d'erreur sont les suivants :
 - -2 : conflict (Note déjà existante)
 - -3 : syntax error (Commande inconnue ou incorrecte)
 
-// TODO : implémenter
 ## Exemples
 
+### Exemple pour la création d'une note
+![Exemple pour la création d'une note](./images/one_note.png)
+
+### Exemple pour la création et la modification de plusieurs notes
+![Exemple pour la création et la modification de plusieurs notes](./images/create_update.png)
+
+### Exemple pour la gestion des erreurs
+![Exemple pour la gestion des erreurs](./images/errors.png)
+
+### Exemple pour la réorganisation des titres et suppression de notes
+![Exemple pour la réorganisation des titres et suppression de notes](./images/title_updates.png)
+
+### Exemple complet avec erreurs et succès
+![Exemple complet avec erreurs et succès](./images/complete.png)
