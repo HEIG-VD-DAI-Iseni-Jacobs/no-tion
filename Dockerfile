@@ -5,8 +5,13 @@ FROM eclipse-temurin:21-jre
 ARG BUILD_DATE
 
 # Metadata
+LABEL org.label-schema.name="no-tion"
+LABEL org.label-schema.description="No-tion is a tool to store notes on a server using a simple protocol."
+LABEL org.label-schema.url="https://github.com/HEIG-VD-DAI-Iseni-Jacobs/no-tion"
 LABEL authors="Aladin Iseni <aladin.iseni@heig-vd.ch>, Arthur Jacobs <arthur.jacobs@heig-vd.ch>"
 LABEL maintainer="Aladin Iseni <aladin.iseni@heig-vd.ch>, Arthur Jacobs <arthur.jacobs@heig-vd.ch>"
+LABEL org.label-schema.version="0.1.0"
+
 
 # Connect this image in the GitHub container registry to the project's repository
 LABEL org.opencontainers.image.source=https://github.com/HEIG-VD-DAI-Iseni-Jacobs/no-tion
