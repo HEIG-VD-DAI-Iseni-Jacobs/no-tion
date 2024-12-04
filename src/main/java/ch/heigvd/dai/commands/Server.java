@@ -18,6 +18,7 @@ public class Server implements Callable<Integer> {
         ERROR,
     }
 
+    private static final List<User> users = new ArrayList<>();
     private static final int NUMBER_OF_THREADS = 20;
 
     protected int port;
@@ -158,7 +159,16 @@ public class Server implements Callable<Integer> {
                 sendError(out, -3);
             } else {
                 String name = tokens[1];
-                user = new User(name);
+                // checks if user already exists
+                for (User u : users) {
+                    if (u.getName().equals(name)) {
+                        user = u;
+                    }
+                }
+                if (user == null) {
+                    user = new User(name);
+                }
+                users.add(user);
                 connected = true;
                 sendOK(out);
             }
