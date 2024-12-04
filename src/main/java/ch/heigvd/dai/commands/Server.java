@@ -11,8 +11,9 @@ import java.util.concurrent.Executors;
 import java.util.*;
 import ch.heigvd.dai.model.*;
 
-@CommandLine.Command(name = "server", description = "Démarre le serveur No-Tion.")
+@CommandLine.Command(name = "server", description = "Start the server No-Tion.")
 public class Server implements Callable<Integer> {
+    private static final int NUMBER_OF_THREADS = 2;
 
     @CommandLine.Option(
             names = {"-p", "--port"},
@@ -27,23 +28,19 @@ public class Server implements Callable<Integer> {
 
     @Override
     public Integer call() {
-        ExecutorService executorService = Executors.newCachedThreadPool();
-
-        try (ServerSocket serverSocket = new ServerSocket(port)) {
-            System.out.println("[SERVEUR] Écoute sur le port " + port);
+        try (ServerSocket serverSocket = new ServerSocket(port);
+             ExecutorService executor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);) {
+            System.out.println("[Server] starting");
+            System.out.println("[Server] listening on port " + port);
 
             while (!serverSocket.isClosed()) {
                 Socket clientSocket = serverSocket.accept();
-                executorService.submit(new ClientHandler(clientSocket));
+                executor.submit(new ClientHandler(clientSocket));
             }
-
         } catch (IOException e) {
-            System.err.println("[SERVEUR] IOException: " + e.getMessage());
+            System.err.println("[SERVEUR] IOException: " + e);
             return 1;
-        } finally {
-            executorService.shutdown();
         }
-
         return 0;
     }
 
@@ -57,15 +54,21 @@ public class Server implements Callable<Integer> {
 
         @Override
         public void run() {
-            try (
-                    socket; // Le socket sera fermé automatiquement
-                    BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
-                    BufferedWriter out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8))
-            ) {
+            try (socket; // This allows to use try-with-resources with the socket
+                 BufferedReader in =
+                         new BufferedReader(
+                                 new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
+                 BufferedWriter out =
+                         new BufferedWriter(
+                                 new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8))) {
                 String line;
                 boolean connected = false;
 
-                System.out.println("[SERVEUR] Nouveau client connecté depuis " + socket.getInetAddress().getHostAddress() + ":" + socket.getPort());
+                System.out.println(
+                        "[SERVEUR] New client connected from "
+                                + socket.getInetAddress().getHostAddress()
+                                + ":"
+                                + socket.getPort());
 
                 while ((line = in.readLine()) != null) {
                     line = line.trim();
