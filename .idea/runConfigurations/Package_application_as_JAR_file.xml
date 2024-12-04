@@ -30,6 +30,7 @@
           </option>
           <option name="goals">
             <list>
+              <option value="spotless:apply" />
               <option value="dependency:go-offline" />
               <option value="clean" />
               <option value="compile" />
