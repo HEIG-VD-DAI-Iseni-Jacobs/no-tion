@@ -11,6 +11,8 @@ import java.util.concurrent.Executors;
 import java.util.*;
 import ch.heigvd.dai.model.*;
 
+import static ch.heigvd.dai.utils.MainUtils.parseInput;
+
 @CommandLine.Command(name = "server", description = "Start the server No-Tion.")
 public class Server implements Callable<Integer> {
     public enum Message {
@@ -81,7 +83,7 @@ public class Server implements Callable<Integer> {
                     line = line.trim();
                     if (line.isEmpty()) continue;
 
-                    String[] tokens = parseLine(line);
+                    String[] tokens = parseInput(line);
                     Client.Command command = null;
 
                     try {
@@ -115,33 +117,6 @@ public class Server implements Callable<Integer> {
             } catch (IOException e) {
                 System.out.println("[SERVEUR] IOException: " + e);
             }
-        }
-
-        private String[] parseLine(String line) {
-            List<String> tokens = new ArrayList<>();
-            boolean inQuotes = false;
-            StringBuilder sb = new StringBuilder();
-
-            for (int i = 0; i < line.length(); i++) {
-                char c = line.charAt(i);
-
-                if (c == '"') {
-                    inQuotes = !inQuotes;
-                } else if (c == ' ' && !inQuotes) {
-                    if (!sb.isEmpty()) {
-                        tokens.add(sb.toString());
-                        sb.setLength(0);
-                    }
-                } else {
-                    sb.append(c);
-                }
-            }
-
-            if (!sb.isEmpty()) {
-                tokens.add(sb.toString());
-            }
-
-            return tokens.toArray(new String[0]);
         }
 
         private void sendOK(BufferedWriter out) throws IOException {
@@ -208,6 +183,7 @@ public class Server implements Callable<Integer> {
                 out.write(index + " " + note.getTitle() + "\n");
                 index++;
             }
+            out.write("\n");
             out.flush();
         }
 
