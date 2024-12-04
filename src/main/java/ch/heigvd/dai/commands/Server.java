@@ -13,6 +13,11 @@ import ch.heigvd.dai.model.*;
 
 @CommandLine.Command(name = "server", description = "Start the server No-Tion.")
 public class Server implements Callable<Integer> {
+    public enum Message {
+        OK,
+        ERROR,
+    }
+
     private static final int NUMBER_OF_THREADS = 2;
 
     @CommandLine.Option(
