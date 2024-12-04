@@ -1,0 +1,46 @@
+@startuml no-tion-scenario-2
+
+title "Scénario 2 : Création et modification de plusieurs notes"
+
+participant "Client" as c
+participant "Server" as s
+
+== Connexion ==
+
+c->s : CONNECT Bob
+s->c : OK
+
+== Création de plusieurs notes ==
+
+c->s : CREATE_NOTE ShoppingList
+s->c : OK
+
+c->s : CREATE_NOTE MeetingNotes
+s->c : OK
+
+== Liste des notes ==
+
+c->s : LIST_NOTES
+s->c : 1 ShoppingList
+s->c : 2 MeetingNotes
+
+== Modification du titre ==
+
+c->s : UPDATE_TITLE 1 Groceries
+s->c : OK
+
+== Récupération du contenu de MeetingNotes ==
+
+c->s : GET_NOTE 2
+s->c : NOTE "Empty"
+
+== Déconnexion ==
+
+note over c, s
+Le client informe le serveur qu'il souhaite se déconnecter.
+Le serveur ferme alors la connexion.
+end note
+
+c->s : DISCONNECT
+
+@enduml

@@ -1,0 +1,51 @@
+@startuml no-tion-scenario-4
+
+title "Scénario 4 : Réorganisation des titres et suppression d'une note"
+
+participant "Client" as c
+participant "Server" as s
+
+== Connexion ==
+
+c->s : CONNECT Bob
+s->c : OK
+
+== Création de plusieurs notes ==
+
+c->s : CREATE_NOTE ShoppingList
+s->c : OK
+
+c->s : CREATE_NOTE WeeklyMenu
+s->c : OK
+
+== Modification du titre d'une note ==
+
+c->s : UPDATE_TITLE 1 Groceries
+s->c : OK
+
+== Vérification de la liste des notes ==
+
+c->s : LIST_NOTES
+s->c : 1 Groceries
+s->c : 2 WeeklyMenu
+
+== Suppression d'une note ==
+
+c->s : DELETE_NOTE 1
+s->c : OK
+
+== Vérification de la liste des notes après suppression ==
+
+c->s : LIST_NOTES
+s->c : 1 WeeklyMenu
+
+== Déconnexion ==
+
+note over c, s
+Le client informe le serveur qu'il souhaite se déconnecter.
+Le serveur ferme alors la connexion.
+end note
+
+c->s : DISCONNECT
+
+@enduml

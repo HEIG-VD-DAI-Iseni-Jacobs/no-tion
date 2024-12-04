@@ -1,0 +1,42 @@
+@startuml no-tion-scenario-1
+
+title "Scénario 1 : Gestion complète d'une seule note"
+
+participant "Client" as c
+participant "Server" as s
+
+== Connexion ==
+
+c->s : CONNECT Alice
+s->c : OK
+
+== Création de la note ==
+
+c->s : CREATE_NOTE ShoppingList
+s->c : OK
+
+== Modification du contenu ==
+
+c->s : UPDATE_CONTENT 1 "Milk, Eggs, Bread"
+s->c : OK
+
+== Récupération du contenu ==
+
+c->s : GET_NOTE 1
+s->c : NOTE "Milk, Eggs, Bread"
+
+== Suppression de la note ==
+
+c->s : DELETE_NOTE 1
+s->c : OK
+
+== Déconnexion ==
+
+note over c, s
+Le client informe le serveur qu'il souhaite se déconnecter.
+Le serveur ferme alors la connexion.
+end note
+
+c->s : DISCONNECT
+
+@enduml

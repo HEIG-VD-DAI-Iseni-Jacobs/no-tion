@@ -1,0 +1,59 @@
+@startuml no-tion-scenario-5
+
+title "Scénario 5 : Scénario complet avec erreurs et succès"
+
+participant "Client" as c
+participant "Server" as s
+
+== Connexion ==
+
+c->s : CONNECT Alice
+s->c : OK
+
+== Création de plusieurs notes ==
+
+c->s : CREATE_NOTE ShoppingList
+s->c : OK
+
+c->s : CREATE_NOTE MeetingNotes
+s->c : OK
+
+== Liste des notes ==
+
+c->s : LIST_NOTES
+s->c : 1 ShoppingList
+s->c : 2 MeetingNotes
+
+== Tentative de modification d'une note inexistante ==
+
+c->s : UPDATE_CONTENT 3 "Prepare agenda"
+s->c : ERROR -1 (not found)
+
+== Modification réussie d'une note ==
+
+c->s : UPDATE_CONTENT 1 "Milk, Eggs, Bread"
+s->c : OK
+
+== Suppression de toutes les notes ==
+
+c->s : DELETE_NOTE 1
+s->c : OK
+
+c->s : DELETE_NOTE 2
+s->c : OK
+
+== Vérification de la liste des notes après suppression ==
+
+c->s : LIST_NOTES
+s->c : (empty response)
+
+== Déconnexion ==
+
+note over c, s
+Le client informe le serveur qu'il souhaite se déconnecter.
+Le serveur ferme alors la connexion.
+end note
+
+c->s : DISCONNECT
+
+@enduml
