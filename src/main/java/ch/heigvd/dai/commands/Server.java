@@ -221,17 +221,8 @@ public class Server implements Callable<Integer> {
         }
 
         private void handleUpdateContent(String[] tokens, BufferedWriter out) throws IOException {
-            if (tokens.length < 3) {
-                sendError(out, -3);
-                return;
-            }
-            int index;
-            try {
-                index = Integer.parseInt(tokens[1]) - 1;
-            } catch (NumberFormatException e) {
-                sendError(out, -3);
-                return;
-            }
+            int index = getNoteIndex(tokens, out);
+            if (index == -1) return;
             String newContent = tokens[2];
             List<Note> notesList = person.getNotes();
             if (index < 0 || index >= notesList.size()) {
@@ -244,17 +235,8 @@ public class Server implements Callable<Integer> {
         }
 
         private void handleUpdateTitle(String[] tokens, BufferedWriter out) throws IOException {
-            if (tokens.length < 3) {
-                sendError(out, -3);
-                return;
-            }
-            int index;
-            try {
-                index = Integer.parseInt(tokens[1]) - 1;
-            } catch (NumberFormatException e) {
-                sendError(out, -3);
-                return;
-            }
+            int index = getNoteIndex(tokens, out);
+            if (index == -1) return;
             String newTitle = tokens[2];
             List<Note> notesList = person.getNotes();
             if (index < 0 || index >= notesList.size()) {
@@ -266,6 +248,21 @@ public class Server implements Callable<Integer> {
                 note.setTitle(newTitle);
                 sendOK(out);
             }
+        }
+
+        private int getNoteIndex(String[] tokens, BufferedWriter out) throws IOException {
+            if (tokens.length < 3) {
+                sendError(out, -3);
+                return -1;
+            }
+            int index;
+            try {
+                index = Integer.parseInt(tokens[1]) - 1;
+                return index;
+            } catch (NumberFormatException e) {
+                sendError(out, -3);
+            }
+            return -1;
         }
     }
 }
