@@ -52,6 +52,7 @@ public class Server implements Callable<Integer> {
     static class ClientHandler implements Runnable {
         private final Socket socket;
         private User person;
+        private boolean connected = false;
 
         public ClientHandler(Socket socket) {
             this.socket = socket;
@@ -67,7 +68,6 @@ public class Server implements Callable<Integer> {
                          new BufferedWriter(
                                  new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8))) {
                 String line;
-                boolean connected = false;
 
                 System.out.println(
                         "[SERVEUR] New client connected from "
@@ -80,51 +80,29 @@ public class Server implements Callable<Integer> {
                     if (line.isEmpty()) continue;
 
                     String[] tokens = parseLine(line);
-                    String command = tokens[0];
-
-                    if (!connected && !command.equals("CONNECT")) {
-                        sendError(out, -3);
-                        continue;
+                    Client.Command command = null;
+                    //String command = tokens[0];
+                    try {
+                        command = Client.Command.valueOf(tokens[0]);
+                    } catch (Exception e) {
+                        // Do nothing
                     }
 
                     switch (command) {
-                        case "CONNECT":
-                            if (tokens.length < 2) {
-                                sendError(out, -3);
-                            } else {
-                                String name = tokens[1];
-                                person = new User(name);
-                                connected = true;
-                                sendOK(out);
-                            }
-                            break;
-                        case "DISCONNECT":
+                        case CONNECT -> handleConnect(tokens, out);
+                        case DISCONNECT -> {
                             socket.close();
                             return;
-                        case "CREATE_NOTE":
-                            handleCreateNote(tokens, out);
-                            break;
-                        case "DELETE_NOTE":
-                            handleDeleteNote(tokens, out);
-                            break;
-                        case "LIST_NOTES":
-                            handleListNotes(out);
-                            break;
-                        case "GET_NOTE":
-                            handleGetNote(tokens, out);
-                            break;
-                        case "UPDATE_CONTENT":
-                            handleUpdateContent(tokens, out);
-                            break;
-                        case "UPDATE_TITLE":
-                            handleUpdateTitle(tokens, out);
-                            break;
-                        default:
-                            sendError(out, -3);
-                            break;
+                        }
+                        case CREATE_NOTE -> handleCreateNote(tokens, out);
+                        case DELETE_NOTE -> handleDeleteNote(tokens, out);
+                        case LIST_NOTES -> handleListNotes(out);
+                        case GET_NOTE -> handleGetNote(tokens, out);
+                        case UPDATE_CONTENT -> handleUpdateContent(tokens, out);
+                        case UPDATE_TITLE -> handleUpdateTitle(tokens, out);
+                        case null, default -> sendError(out, -3);
                     }
                 }
-
             } catch (IOException e) {
                 System.err.println("[SERVEUR] IOException: " + e.getMessage());
             } finally {
@@ -167,6 +145,16 @@ public class Server implements Callable<Integer> {
         private void sendError(BufferedWriter out, int code) throws IOException {
             out.write("ERROR " + code + "\n");
             out.flush();
+        }
+
+        private void handleConnect(String[] tokens, BufferedWriter out) throws IOException {
+            if (!connected || tokens.length < 2) {
+                sendError(out, -3);
+            } else {
+                String name = tokens[1];
+                person = new User(name);
+                sendOK(out);
+            }
         }
 
         private void handleCreateNote(String[] tokens, BufferedWriter out) throws IOException {
