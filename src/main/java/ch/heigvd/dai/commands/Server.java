@@ -18,13 +18,14 @@ public class Server implements Callable<Integer> {
         ERROR,
     }
 
-    private static final int NUMBER_OF_THREADS = 2;
+    private static final int NUMBER_OF_THREADS = 20;
+
+    protected int port;
 
     @CommandLine.Option(
             names = {"-p", "--port"},
             description = "Port à utiliser (défaut: ${DEFAULT-VALUE}).",
             defaultValue = "16447")
-    protected int port;
 
     public static void main(String[] args) {
         int exitCode = new CommandLine(new Server()).execute(args);
@@ -43,7 +44,7 @@ public class Server implements Callable<Integer> {
                 executor.submit(new ClientHandler(clientSocket));
             }
         } catch (IOException e) {
-            System.err.println("[SERVEUR] IOException: " + e);
+            System.out.println("[SERVEUR] IOException: " + e);
             return 1;
         }
         return 0;
@@ -51,7 +52,7 @@ public class Server implements Callable<Integer> {
 
     static class ClientHandler implements Runnable {
         private final Socket socket;
-        private User person;
+        private User user;
         private boolean connected = false;
 
         public ClientHandler(Socket socket) {
@@ -81,11 +82,16 @@ public class Server implements Callable<Integer> {
 
                     String[] tokens = parseLine(line);
                     Client.Command command = null;
-                    //String command = tokens[0];
+
                     try {
                         command = Client.Command.valueOf(tokens[0]);
                     } catch (Exception e) {
                         // Do nothing
+                    }
+
+                    if (!connected && !tokens[0].equals(Client.Command.CONNECT.toString())) {
+                        sendError(out, -3);
+                        continue;
                     }
 
                     switch (command) {
@@ -103,10 +109,10 @@ public class Server implements Callable<Integer> {
                         case null, default -> sendError(out, -3);
                     }
                 }
-            } catch (IOException e) {
-                System.err.println("[SERVEUR] IOException: " + e.getMessage());
-            } finally {
+                out.flush();
                 System.out.println("[SERVEUR] Connexion avec le client terminée");
+            } catch (IOException e) {
+                System.out.println("[SERVEUR] IOException: " + e);
             }
         }
 
@@ -148,11 +154,12 @@ public class Server implements Callable<Integer> {
         }
 
         private void handleConnect(String[] tokens, BufferedWriter out) throws IOException {
-            if (!connected || tokens.length < 2) {
+            if (connected || tokens.length < 2) {
                 sendError(out, -3);
             } else {
                 String name = tokens[1];
-                person = new User(name);
+                user = new User(name);
+                connected = true;
                 sendOK(out);
             }
         }
@@ -163,10 +170,10 @@ public class Server implements Callable<Integer> {
                 return;
             }
             String title = tokens[1];
-            if (person.hasNoteWithTitle(title)) {
+            if (user.hasNoteWithTitle(title)) {
                 sendError(out, -2);
             } else {
-                person.addNote(new Note(title, ""));
+                user.addNote(new Note(title, ""));
                 sendOK(out);
             }
         }
@@ -177,7 +184,7 @@ public class Server implements Callable<Integer> {
                 return;
             }
             String title = tokens[1];
-            if (person.deleteNoteByTitle(title)) {
+            if (user.deleteNoteByTitle(title)) {
                 sendOK(out);
             } else {
                 sendError(out, -1);
@@ -185,7 +192,7 @@ public class Server implements Callable<Integer> {
         }
 
         private void handleListNotes(BufferedWriter out) throws IOException {
-            List<Note> notesList = person.getNotes();
+            List<Note> notesList = user.getNotes();
             int index = 1;
             for (Note note : notesList) {
                 out.write(index + " " + note.getTitle() + "\n");
@@ -206,7 +213,7 @@ public class Server implements Callable<Integer> {
                 sendError(out, -3);
                 return;
             }
-            List<Note> notesList = person.getNotes();
+            List<Note> notesList = user.getNotes();
             if (index < 0 || index >= notesList.size()) {
                 sendError(out, -1);
             } else {
@@ -219,26 +226,29 @@ public class Server implements Callable<Integer> {
         private void handleUpdateContent(String[] tokens, BufferedWriter out) throws IOException {
             int index = getNoteIndex(tokens, out);
             if (index == -1) return;
-            String newContent = tokens[2];
-            List<Note> notesList = person.getNotes();
+            List<Note> notesList = user.getNotes();
             if (index < 0 || index >= notesList.size()) {
                 sendError(out, -1);
-            } else {
-                Note note = notesList.get(index);
-                note.setContent(newContent);
-                sendOK(out);
+                return;
             }
+            String newContent = tokens[2];
+            Note note = notesList.get(index);
+            note.setContent(newContent);
+            sendOK(out);
         }
 
         private void handleUpdateTitle(String[] tokens, BufferedWriter out) throws IOException {
             int index = getNoteIndex(tokens, out);
-            if (index == -1) return;
-            String newTitle = tokens[2];
-            List<Note> notesList = person.getNotes();
+            List<Note> notesList = user.getNotes();
             if (index < 0 || index >= notesList.size()) {
                 sendError(out, -1);
-            } else if (person.hasNoteWithTitle(newTitle)) {
+                return;
+            }
+            String newTitle = tokens[2];
+            if (user.hasNoteWithTitle(newTitle)) {
                 sendError(out, -2);
+            } else if (newTitle.isEmpty()) {
+                sendError(out, -3);
             } else {
                 Note note = notesList.get(index);
                 note.setTitle(newTitle);
