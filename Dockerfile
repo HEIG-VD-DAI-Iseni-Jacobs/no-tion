@@ -20,6 +20,9 @@ LABEL org.label-schema.build-date=$BUILD_DATE
 WORKDIR /app
 COPY target/no-tion-1.0-SNAPSHOT.jar /app/no-tion-1.0-SNAPSHOT.jar
 
+# Expose the dedicated port (mainly for documentation purposes, not really needed)
+EXPOSE 16447
+
 # Run the application
 ENTRYPOINT ["java", "-jar", "no-tion-1.0-SNAPSHOT.jar"]
 
