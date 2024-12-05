@@ -64,10 +64,6 @@ public class Server implements Callable<Integer> {
     return 0;
   }
 
-  /**
-   * The client handler class. Handle the client connection. Each client is handled in a separate
-   * thread.
-   */
   static class ClientHandler implements Runnable {
     private final Socket socket;
     private User user;
@@ -79,7 +75,7 @@ public class Server implements Callable<Integer> {
 
     @Override
     public void run() {
-      try (socket; // This allows to use try-with-resources with the socket
+      try (socket;
           BufferedReader in =
               new BufferedReader(
                   new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
@@ -104,10 +100,9 @@ public class Server implements Callable<Integer> {
           try {
             command = Client.Command.valueOf(tokens[0]);
           } catch (Exception e) {
-            // Do nothing
+            // unknown command
           }
 
-          // Check if the user is connected and the command is not CONNECT
           if (!connected && !tokens[0].equals(Client.Command.CONNECT.toString())) {
             sendError(out, Error.INVALID_COMMAND.getCode());
             continue;
@@ -145,19 +140,11 @@ public class Server implements Callable<Integer> {
       out.flush();
     }
 
-    /**
-     * Handle the connect command. Connect the user to the server.
-     *
-     * @param tokens The tokens from the client.
-     * @param out The output stream to send the error.
-     * @throws IOException If an I/O error occurs.
-     */
     private void handleConnect(String[] tokens, BufferedWriter out) throws IOException {
       if (connected || tokens.length < 2) {
         sendError(out, Error.INVALID_COMMAND.getCode());
       } else {
         String name = tokens[1];
-        // checks if user already exists
         for (User u : users) {
           if (u.getName().equals(name)) {
             user = u;
@@ -172,13 +159,6 @@ public class Server implements Callable<Integer> {
       }
     }
 
-    /**
-     * Handle the create note command. Create a new note with the given title.
-     *
-     * @param tokens The tokens from the client.
-     * @param out The output stream to send the error.
-     * @throws IOException If an I/O error occurs.
-     */
     private void handleCreateNote(String[] tokens, BufferedWriter out) throws IOException {
       if (tokens.length < 2) {
         sendError(out, Error.INVALID_COMMAND.getCode());
@@ -188,18 +168,12 @@ public class Server implements Callable<Integer> {
       if (user.hasNoteWithTitle(title)) {
         sendError(out, Error.NOTE_ALREADY_EXISTS.getCode());
       } else {
+        // Note initially empty, no scrambling needed since it's empty
         user.addNote(new Note(title, ""));
         sendOK(out);
       }
     }
 
-    /**
-     * Handle the delete note command. Delete the note with the given title.
-     *
-     * @param tokens The tokens from the client.
-     * @param out The output stream to send the error.
-     * @throws IOException If an I/O error occurs.
-     */
     private void handleDeleteNote(String[] tokens, BufferedWriter out) throws IOException {
       if (tokens.length < 2) {
         sendError(out, Error.INVALID_COMMAND.getCode());
@@ -213,12 +187,6 @@ public class Server implements Callable<Integer> {
       }
     }
 
-    /**
-     * Handle the list notes command. Send the list of notes to the client.
-     *
-     * @param out The output stream to send the error.
-     * @throws IOException If an I/O error occurs.
-     */
     private void handleListNotes(BufferedWriter out) throws IOException {
       List<Note> notesList = user.getNotes();
       int index = 1;
@@ -230,13 +198,6 @@ public class Server implements Callable<Integer> {
       out.flush();
     }
 
-    /**
-     * Handle the get note command. Send the content of the note to the client.
-     *
-     * @param tokens The tokens from the client.
-     * @param out The output stream to send the error.
-     * @throws IOException If an I/O error occurs.
-     */
     private void handleGetNote(String[] tokens, BufferedWriter out) throws IOException {
       if (tokens.length < 2) {
         sendError(out, Error.INVALID_COMMAND.getCode());
@@ -260,11 +221,9 @@ public class Server implements Callable<Integer> {
     }
 
     /**
-     * Handle the update content command. Update the content of the note.
-     *
-     * @param tokens The tokens from the client.
-     * @param out The output stream to send the error.
-     * @throws IOException If an I/O error occurs.
+     * Handle the update content command. Update the content of the note. Before storing the
+     * content, we scramble each word so that only the first and last letters remain in place, and
+     * the middle letters are randomized.
      */
     private void handleUpdateContent(String[] tokens, BufferedWriter out) throws IOException {
       int index = getNoteIndex(tokens, out);
@@ -274,19 +233,17 @@ public class Server implements Callable<Integer> {
         sendError(out, Error.NOTE_NOT_FOUND.getCode());
         return;
       }
+      // The content is at tokens[2]
       String newContent = tokens[2];
+
+      // Scramble the content before storing
+      newContent = scrambleContent(newContent);
+
       Note note = notesList.get(index);
       note.setContent(newContent);
       sendOK(out);
     }
 
-    /**
-     * Handle the update title command. Update the title of the note.
-     *
-     * @param tokens The tokens from the client.
-     * @param out The output stream to send the error.
-     * @throws IOException If an I/O error occurs.
-     */
     private void handleUpdateTitle(String[] tokens, BufferedWriter out) throws IOException {
       int index = getNoteIndex(tokens, out);
       List<Note> notesList = user.getNotes();
@@ -306,14 +263,6 @@ public class Server implements Callable<Integer> {
       }
     }
 
-    /**
-     * Get the index of the note from the tokens.
-     *
-     * @param tokens The tokens from the client.
-     * @param out The output stream to send the error.
-     * @return The index of the note.
-     * @throws IOException If an I/O error occurs.
-     */
     private int getNoteIndex(String[] tokens, BufferedWriter out) throws IOException {
       if (tokens.length < 3) {
         sendError(out, Error.INVALID_COMMAND.getCode());
@@ -327,6 +276,38 @@ public class Server implements Callable<Integer> {
         sendError(out, Error.INVALID_COMMAND.getCode());
       }
       return Error.NOTE_NOT_FOUND.getCode();
+    }
+
+    /**
+     * Scramble the content of a note. For each word, the first and last letter remain the same, but
+     * the middle letters are shuffled.
+     */
+    private String scrambleContent(String content) {
+      String[] words = content.split(" ");
+      StringBuilder scrambled = new StringBuilder();
+      for (int i = 0; i < words.length; i++) {
+        if (i > 0) scrambled.append(" ");
+        scrambled.append(scrambleWord(words[i]));
+      }
+      return scrambled.toString();
+    }
+
+    /** Scramble a single word by shuffling the letters between the first and last character. */
+    private String scrambleWord(String word) {
+      if (word.length() <= 3) {
+        return word; // Too short to shuffle or not worth changing
+      }
+      char[] chars = word.toCharArray();
+      List<Character> middle = new ArrayList<>();
+      for (int i = 1; i < chars.length - 1; i++) {
+        middle.add(chars[i]);
+      }
+      // Shuffle the middle characters
+      Collections.shuffle(middle);
+      for (int i = 1; i < chars.length - 1; i++) {
+        chars[i] = middle.get(i - 1);
+      }
+      return new String(chars);
     }
   }
 }
