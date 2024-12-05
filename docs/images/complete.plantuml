@@ -2,58 +2,72 @@
 
 title "Scénario 5 : Scénario complet avec erreurs et succès"
 
-participant "Client" as c
+participant "Client 1" as c_1
 participant "Server" as s
 
 == Connexion ==
 
-c->s : CONNECT Alice
-s->c : OK
+c_1->s : CREATE_NOTE ShoppingList
+s->c_1 : ERROR -2 (not connected)
+
+c_1->s : CONNECT Alice
+s->c_1 : OK
+
+c_2->s : CONNECT Alice
+s->c_2 : OK
 
 == Création de plusieurs notes ==
 
-c->s : CREATE_NOTE ShoppingList
-s->c : OK
+c_1->s : CREATE_NOTE ShoppingList
+s->c_1 : OK
 
-c->s : CREATE_NOTE MeetingNotes
-s->c : OK
+c_1->s : CREATE_NOTE MeetingNotes
+s->c_1 : OK
 
 == Liste des notes ==
 
-c->s : LIST_NOTES
-s->c : 1 ShoppingList
-s->c : 2 MeetingNotes
+c_1->s : LIST_NOTES
+s->c_1 : 1 ShoppingList
+s->c_1 : 2 MeetingNotes
+
+c_2->s : LIST_NOTES
+s->c_2 : 1 ShoppingList
+s->c_2 : 2 MeetingNotes
 
 == Tentative de modification d'une note inexistante ==
 
-c->s : UPDATE_CONTENT 3 "Prepare agenda"
-s->c : ERROR -1 (not found)
+c_1->s : UPDATE_CONTENT 3 "Prepare agenda"
+s->c_1 : ERROR -1 (not found)
 
 == Modification réussie d'une note ==
 
-c->s : UPDATE_CONTENT 1 "Milk, Eggs, Bread"
-s->c : OK
+c_2->s : UPDATE_CONTENT 1 "Milk, Eggs, Bread"
+s->c_1 : OK
 
 == Suppression de toutes les notes ==
 
-c->s : DELETE_NOTE 1
-s->c : OK
+c_1->s : DELETE_NOTE 1
+s->c_1 : OK
 
-c->s : DELETE_NOTE 2
-s->c : OK
+c_1->s : DELETE_NOTE 2
+s->c_1 : OK
 
 == Vérification de la liste des notes après suppression ==
 
-c->s : LIST_NOTES
-s->c : (empty response)
+c_1->s : LIST_NOTES
+s->c_1 : (empty response)
+
+c_2->s : LIST_NOTES
+s->c_2 : (empty response)
 
 == Déconnexion ==
 
-note over c, s
+note over c_1, c_2
 Le client informe le serveur qu'il souhaite se déconnecter.
 Le serveur ferme alors la connexion.
 end note
 
-c->s : DISCONNECT
+c_1->s : DISCONNECT
+c_2->s : DISCONNECT
 
 @enduml
