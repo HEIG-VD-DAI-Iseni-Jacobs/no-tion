@@ -21,6 +21,22 @@ public class Server implements Callable<Integer> {
     ERROR,
   }
 
+  public enum Error {
+    NOTE_NOT_FOUND(-1),
+    NOTE_ALREADY_EXISTS(-2),
+    INVALID_COMMAND(-3);
+
+    private final int code;
+
+    Error(int code) {
+      this.code = code;
+    }
+
+    public int getCode() {
+      return code;
+    }
+  }
+
   private static final CopyOnWriteArrayList<User> users = new CopyOnWriteArrayList<>();
   private static final int NUMBER_OF_THREADS = 20;
 
@@ -92,7 +108,7 @@ public class Server implements Callable<Integer> {
 
           // Check if the user is connected and the command is not CONNECT
           if (!connected && !tokens[0].equals(Client.Command.CONNECT.toString())) {
-            sendError(out, -3);
+            sendError(out, Error.INVALID_COMMAND.getCode());
             continue;
           }
 
@@ -108,7 +124,7 @@ public class Server implements Callable<Integer> {
             case GET_NOTE -> handleGetNote(tokens, out);
             case UPDATE_CONTENT -> handleUpdateContent(tokens, out);
             case UPDATE_TITLE -> handleUpdateTitle(tokens, out);
-            case null, default -> sendError(out, -3);
+            case null, default -> sendError(out, Error.INVALID_COMMAND.getCode());
           }
         }
         out.flush();
@@ -137,7 +153,7 @@ public class Server implements Callable<Integer> {
      */
     private void handleConnect(String[] tokens, BufferedWriter out) throws IOException {
       if (connected || tokens.length < 2) {
-        sendError(out, -3);
+        sendError(out, Error.INVALID_COMMAND.getCode());
       } else {
         String name = tokens[1];
         // checks if user already exists
@@ -164,12 +180,12 @@ public class Server implements Callable<Integer> {
      */
     private void handleCreateNote(String[] tokens, BufferedWriter out) throws IOException {
       if (tokens.length < 2) {
-        sendError(out, -3);
+        sendError(out, Error.INVALID_COMMAND.getCode());
         return;
       }
       String title = tokens[1];
       if (user.hasNoteWithTitle(title)) {
-        sendError(out, -2);
+        sendError(out, Error.NOTE_ALREADY_EXISTS.getCode());
       } else {
         user.addNote(new Note(title, ""));
         sendOK(out);
@@ -185,14 +201,14 @@ public class Server implements Callable<Integer> {
      */
     private void handleDeleteNote(String[] tokens, BufferedWriter out) throws IOException {
       if (tokens.length < 2) {
-        sendError(out, -3);
+        sendError(out, Error.INVALID_COMMAND.getCode());
         return;
       }
       String title = tokens[1];
       if (user.deleteNoteByTitle(title)) {
         sendOK(out);
       } else {
-        sendError(out, -1);
+        sendError(out, Error.NOTE_NOT_FOUND.getCode());
       }
     }
 
@@ -222,19 +238,19 @@ public class Server implements Callable<Integer> {
      */
     private void handleGetNote(String[] tokens, BufferedWriter out) throws IOException {
       if (tokens.length < 2) {
-        sendError(out, -3);
+        sendError(out, Error.INVALID_COMMAND.getCode());
         return;
       }
       int index;
       try {
         index = Integer.parseInt(tokens[1]) - 1;
       } catch (NumberFormatException e) {
-        sendError(out, -3);
+        sendError(out, Error.INVALID_COMMAND.getCode());
         return;
       }
       List<Note> notesList = user.getNotes();
       if (index < 0 || index >= notesList.size()) {
-        sendError(out, -1);
+        sendError(out, Error.NOTE_NOT_FOUND.getCode());
       } else {
         Note note = notesList.get(index);
         out.write("NOTE " + note.getContent() + "\n");
@@ -251,10 +267,10 @@ public class Server implements Callable<Integer> {
      */
     private void handleUpdateContent(String[] tokens, BufferedWriter out) throws IOException {
       int index = getNoteIndex(tokens, out);
-      if (index == -1) return;
+      if (index == Error.NOTE_NOT_FOUND.getCode()) return;
       List<Note> notesList = user.getNotes();
       if (index < 0 || index >= notesList.size()) {
-        sendError(out, -1);
+        sendError(out, Error.NOTE_NOT_FOUND.getCode());
         return;
       }
       String newContent = tokens[2];
@@ -274,14 +290,14 @@ public class Server implements Callable<Integer> {
       int index = getNoteIndex(tokens, out);
       List<Note> notesList = user.getNotes();
       if (index < 0 || index >= notesList.size()) {
-        sendError(out, -1);
+        sendError(out, Error.NOTE_NOT_FOUND.getCode());
         return;
       }
       String newTitle = tokens[2];
       if (user.hasNoteWithTitle(newTitle)) {
-        sendError(out, -2);
+        sendError(out, Error.NOTE_ALREADY_EXISTS.getCode());
       } else if (newTitle.isEmpty()) {
-        sendError(out, -3);
+        sendError(out, Error.INVALID_COMMAND.getCode());
       } else {
         Note note = notesList.get(index);
         note.setTitle(newTitle);
@@ -299,17 +315,17 @@ public class Server implements Callable<Integer> {
      */
     private int getNoteIndex(String[] tokens, BufferedWriter out) throws IOException {
       if (tokens.length < 3) {
-        sendError(out, -3);
-        return -1;
+        sendError(out, Error.INVALID_COMMAND.getCode());
+        return Error.NOTE_NOT_FOUND.getCode();
       }
       int index;
       try {
         index = Integer.parseInt(tokens[1]) - 1;
         return index;
       } catch (NumberFormatException e) {
-        sendError(out, -3);
+        sendError(out, Error.INVALID_COMMAND.getCode());
       }
-      return -1;
+      return Error.NOTE_NOT_FOUND.getCode();
     }
   }
 }
