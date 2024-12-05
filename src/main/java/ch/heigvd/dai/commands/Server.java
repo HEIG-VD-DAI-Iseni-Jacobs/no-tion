@@ -41,15 +41,15 @@ public class Server implements Callable<Integer> {
   private static final int NUMBER_OF_THREADS = 20;
 
   @CommandLine.Option(
-          names = {"-p", "--port"},
-          description = "Port à utiliser (défaut: ${DEFAULT-VALUE}).",
-          defaultValue = "16447")
+      names = {"-p", "--port"},
+      description = "Port à utiliser (défaut: ${DEFAULT-VALUE}).",
+      defaultValue = "16447")
   private int port;
 
   @Override
   public Integer call() {
     try (ServerSocket serverSocket = new ServerSocket(port);
-         ExecutorService executor = Executors.newFixedThreadPool(NUMBER_OF_THREADS); ) {
+        ExecutorService executor = Executors.newFixedThreadPool(NUMBER_OF_THREADS); ) {
       System.out.println("[Server] starting");
       System.out.println("[Server] listening on port " + port);
 
@@ -76,15 +76,19 @@ public class Server implements Callable<Integer> {
     @Override
     public void run() {
       try (socket;
-           BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
-           BufferedWriter out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8))) {
+          BufferedReader in =
+              new BufferedReader(
+                  new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
+          BufferedWriter out =
+              new BufferedWriter(
+                  new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8))) {
         String line;
 
         System.out.println(
-                "[SERVEUR] New client connected from "
-                        + socket.getInetAddress().getHostAddress()
-                        + ":"
-                        + socket.getPort());
+            "[SERVEUR] New client connected from "
+                + socket.getInetAddress().getHostAddress()
+                + ":"
+                + socket.getPort());
 
         while ((line = in.readLine()) != null) {
           line = line.trim();
@@ -217,9 +221,9 @@ public class Server implements Callable<Integer> {
     }
 
     /**
-     * Handle the update content command. Update the content of the note.
-     * Before storing the content, we scramble each word so that only the first and last letters
-     * remain in place, and the middle letters are randomized.
+     * Handle the update content command. Update the content of the note. Before storing the
+     * content, we scramble each word so that only the first and last letters remain in place, and
+     * the middle letters are randomized.
      */
     private void handleUpdateContent(String[] tokens, BufferedWriter out) throws IOException {
       int index = getNoteIndex(tokens, out);
@@ -275,8 +279,8 @@ public class Server implements Callable<Integer> {
     }
 
     /**
-     * Scramble the content of a note.
-     * For each word, the first and last letter remain the same, but the middle letters are shuffled.
+     * Scramble the content of a note. For each word, the first and last letter remain the same, but
+     * the middle letters are shuffled.
      */
     private String scrambleContent(String content) {
       String[] words = content.split(" ");
@@ -288,9 +292,7 @@ public class Server implements Callable<Integer> {
       return scrambled.toString();
     }
 
-    /**
-     * Scramble a single word by shuffling the letters between the first and last character.
-     */
+    /** Scramble a single word by shuffling the letters between the first and last character. */
     private String scrambleWord(String word) {
       if (word.length() <= 3) {
         return word; // Too short to shuffle or not worth changing
