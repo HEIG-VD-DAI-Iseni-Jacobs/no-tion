@@ -7,6 +7,9 @@ participant "Server" as s
 
 == Connexion ==
 
+c->s : CREATE_NOTE ShoppingList
+s->c : ERROR -3 (not connected)
+
 c->s : CONNECT Alice
 s->c : OK
 
@@ -27,8 +30,8 @@ s->c : ERROR -2 (conflict)
 
 == Correction : création d'une autre note ==
 
-c->s : CREATE_NOTE WeeklyMenu
-s->c : OK
+c->s : DELETE_NOTE 4
+s->c : ERROR -1 (not found)
 
 == Déconnexion ==
 
