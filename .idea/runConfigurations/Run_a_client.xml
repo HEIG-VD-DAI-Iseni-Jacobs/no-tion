@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Run a client" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="ch.heigvd.dai.Main" />
+    <module name="no-tion" />
+    <option name="PROGRAM_PARAMETERS" value="client -p 16447" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
