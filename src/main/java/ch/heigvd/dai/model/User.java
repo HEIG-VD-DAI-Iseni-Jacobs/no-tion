@@ -21,6 +21,12 @@ public class User {
     return notes;
   }
 
+  /**
+   * Checks if a note with a given title exists.
+   *
+   * @param title The title of the note.
+   * @return true if a note with the given title exists, false otherwise.
+   */
   public boolean hasNoteWithTitle(String title) {
     for (Note note : notes) {
       if (note.getTitle().equals(title)) {
@@ -34,6 +40,12 @@ public class User {
     notes.add(note);
   }
 
+  /**
+   * Deletes a note by its title.
+   *
+   * @param title The title of the note.
+   * @return true if the note was deleted, false otherwise.
+   */
   public boolean deleteNoteByTitle(String title) {
     Iterator<Note> iterator = notes.iterator();
     while (iterator.hasNext()) {

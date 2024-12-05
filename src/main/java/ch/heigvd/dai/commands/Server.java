@@ -30,11 +30,6 @@ public class Server implements Callable<Integer> {
       defaultValue = "16447")
   private int port;
 
-  //    public static void main(String[] args) {
-  //        int exitCode = new CommandLine(new Server()).execute(args);
-  //        System.exit(exitCode);
-  //    }
-
   @Override
   public Integer call() {
     try (ServerSocket serverSocket = new ServerSocket(port);
@@ -53,6 +48,9 @@ public class Server implements Callable<Integer> {
     return 0;
   }
 
+  /**
+   * The client handler class. Handle the client connection. Each client is handled in a separate thread.
+   */
   static class ClientHandler implements Runnable {
     private final Socket socket;
     private User user;
@@ -92,6 +90,7 @@ public class Server implements Callable<Integer> {
             // Do nothing
           }
 
+          // Check if the user is connected and the command is not CONNECT
           if (!connected && !tokens[0].equals(Client.Command.CONNECT.toString())) {
             sendError(out, -3);
             continue;
@@ -129,6 +128,13 @@ public class Server implements Callable<Integer> {
       out.flush();
     }
 
+    /**
+     * Handle the connect command. Connect the user to the server.
+     *
+     * @param tokens The tokens from the client.
+     * @param out The output stream to send the error.
+     * @throws IOException If an I/O error occurs.
+     */
     private void handleConnect(String[] tokens, BufferedWriter out) throws IOException {
       if (connected || tokens.length < 2) {
         sendError(out, -3);
@@ -149,6 +155,13 @@ public class Server implements Callable<Integer> {
       }
     }
 
+    /**
+     * Handle the create note command. Create a new note with the given title.
+     *
+     * @param tokens The tokens from the client.
+     * @param out The output stream to send the error.
+     * @throws IOException If an I/O error occurs.
+     */
     private void handleCreateNote(String[] tokens, BufferedWriter out) throws IOException {
       if (tokens.length < 2) {
         sendError(out, -3);
@@ -163,6 +176,13 @@ public class Server implements Callable<Integer> {
       }
     }
 
+    /**
+     * Handle the delete note command. Delete the note with the given title.
+     *
+     * @param tokens The tokens from the client.
+     * @param out The output stream to send the error.
+     * @throws IOException If an I/O error occurs.
+     */
     private void handleDeleteNote(String[] tokens, BufferedWriter out) throws IOException {
       if (tokens.length < 2) {
         sendError(out, -3);
@@ -176,6 +196,12 @@ public class Server implements Callable<Integer> {
       }
     }
 
+    /**
+     * Handle the list notes command. Send the list of notes to the client.
+     *
+     * @param out The output stream to send the error.
+     * @throws IOException If an I/O error occurs.
+     */
     private void handleListNotes(BufferedWriter out) throws IOException {
       List<Note> notesList = user.getNotes();
       int index = 1;
@@ -187,6 +213,13 @@ public class Server implements Callable<Integer> {
       out.flush();
     }
 
+    /**
+     * Handle the get note command. Send the content of the note to the client.
+     *
+     * @param tokens The tokens from the client.
+     * @param out The output stream to send the error.
+     * @throws IOException If an I/O error occurs.
+     */
     private void handleGetNote(String[] tokens, BufferedWriter out) throws IOException {
       if (tokens.length < 2) {
         sendError(out, -3);
@@ -209,6 +242,13 @@ public class Server implements Callable<Integer> {
       }
     }
 
+    /**
+     * Handle the update content command. Update the content of the note.
+     *
+     * @param tokens The tokens from the client.
+     * @param out The output stream to send the error.
+     * @throws IOException If an I/O error occurs.
+     */
     private void handleUpdateContent(String[] tokens, BufferedWriter out) throws IOException {
       int index = getNoteIndex(tokens, out);
       if (index == -1) return;
@@ -223,6 +263,13 @@ public class Server implements Callable<Integer> {
       sendOK(out);
     }
 
+    /**
+     * Handle the update title command. Update the title of the note.
+     *
+     * @param tokens The tokens from the client.
+     * @param out The output stream to send the error.
+     * @throws IOException If an I/O error occurs.
+     */
     private void handleUpdateTitle(String[] tokens, BufferedWriter out) throws IOException {
       int index = getNoteIndex(tokens, out);
       List<Note> notesList = user.getNotes();
@@ -242,6 +289,14 @@ public class Server implements Callable<Integer> {
       }
     }
 
+    /**
+     * Get the index of the note from the tokens.
+     *
+     * @param tokens The tokens from the client.
+     * @param out The output stream to send the error.
+     * @return The index of the note.
+     * @throws IOException If an I/O error occurs.
+     */
     private int getNoteIndex(String[] tokens, BufferedWriter out) throws IOException {
       if (tokens.length < 3) {
         sendError(out, -3);

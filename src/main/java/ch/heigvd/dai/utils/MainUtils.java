@@ -4,6 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainUtils {
+  /**
+   * Parses an input string into multiple tokens considering quotation marks.
+   *
+   * @param input The input string to parse.
+   * @return An array of extracted tokens.
+   */
   public static String[] parseInput(String input) {
     List<String> tokens = new ArrayList<>();
     boolean inQuotes = false;
@@ -13,11 +19,11 @@ public class MainUtils {
       char c = input.charAt(i);
 
       if (c == '"') {
-        inQuotes = !inQuotes;
+        inQuotes = !inQuotes; // Toggle quotes
       } else if (c == ' ' && !inQuotes) {
         if (!sb.isEmpty()) {
           tokens.add(sb.toString());
-          sb.setLength(0);
+          sb.setLength(0); // Reset the StringBuilder
         }
       } else {
         sb.append(c);
