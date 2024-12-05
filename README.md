@@ -86,7 +86,7 @@ In the "Run" tab, select `Package application as JAR file` and run it.
 
 #### Run
 
-In the "Run" tab, select `Run the server` then `Run a client` and run it.
+In the "Run" tab, select `Run the server` then `Run a client` and run it (and `Run another client` to test multi-client support).
 Feel free to update the run config or launch the app from the terminal to add your parameters !
 For more details on the commands see Available Commands.
 
