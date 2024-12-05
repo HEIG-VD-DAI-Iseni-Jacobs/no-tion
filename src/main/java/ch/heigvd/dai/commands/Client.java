@@ -111,7 +111,7 @@ public class Client implements Callable<Integer> {
               System.out.println("Invalid title.\n");
               continue;
             }
-            sendCommand(out, "CREATE_NOTE " + title);
+            sendCommand(out, "CREATE_NOTE " + "\"" + title + "\"");
             String response = in.readLine();
             handleServerResponse(response);
             System.out.println();
@@ -187,7 +187,7 @@ public class Client implements Callable<Integer> {
               System.out.println("Invalid title.\n");
               continue;
             }
-            sendCommand(out, "UPDATE_TITLE " + index + " " + newTitle);
+            sendCommand(out, "UPDATE_TITLE " + index + " \"" + newTitle + "\"");
             String response = in.readLine();
             handleServerResponse(response);
             System.out.println();
@@ -239,22 +239,22 @@ public class Client implements Callable<Integer> {
       return null;
     }
 
-      return switch (line.trim()) {
-          case "0" -> Command.QUIT;
-          case "1" -> Command.CONNECT;
-          case "2" -> Command.DISCONNECT;
-          case "3" -> Command.CREATE_NOTE;
-          case "4" -> Command.DELETE_NOTE;
-          case "5" -> Command.LIST_NOTES;
-          case "6" -> Command.GET_NOTE;
-          case "7" -> Command.UPDATE_CONTENT;
-          case "8" -> Command.UPDATE_TITLE;
-          case "9" -> Command.HELP;
-          default -> {
-              System.out.println("Invalid choice. Please try again.\n");
-              yield null;
-          }
-      };
+    return switch (line.trim()) {
+      case "0" -> Command.QUIT;
+      case "1" -> Command.CONNECT;
+      case "2" -> Command.DISCONNECT;
+      case "3" -> Command.CREATE_NOTE;
+      case "4" -> Command.DELETE_NOTE;
+      case "5" -> Command.LIST_NOTES;
+      case "6" -> Command.GET_NOTE;
+      case "7" -> Command.UPDATE_CONTENT;
+      case "8" -> Command.UPDATE_TITLE;
+      case "9" -> Command.HELP;
+      default -> {
+        System.out.println("Invalid choice. Please try again.\n");
+        yield null;
+      }
+    };
   }
 
   private void sendCommand(BufferedWriter out, String command) throws IOException {
