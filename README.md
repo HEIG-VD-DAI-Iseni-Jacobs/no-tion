@@ -140,9 +140,13 @@ Example of connection:
 
 ![Example of connection](./docs/images/connection.png)
 
-Basic example of usage:
+Basic examples of usage:
 
-![Basic example of usage](./docs/images/simple_example.jpg)
+1. Help message:
+![Basic example of usage](./docs/images/simple_example.png)
+
+2. Create a note and list all notes:
+![Basic example of usage](./docs/images/simple_example_2.png)
 
 
 ## Contributing
