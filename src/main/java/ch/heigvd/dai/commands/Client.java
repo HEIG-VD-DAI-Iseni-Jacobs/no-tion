@@ -9,27 +9,25 @@ import java.util.concurrent.Callable;
 import picocli.CommandLine;
 
 /**
- * Client implementation for the No-Tion note-taking application.
- * Handles user interaction with the server and supports various commands to manage notes.
- * Implements Callable interface for command-line execution via picocli.
+ * Client implementation for the No-Tion note-taking application. Handles user interaction with the
+ * server and supports various commands to manage notes. Implements Callable interface for
+ * command-line execution via picocli.
  */
 @CommandLine.Command(name = "client", description = "Client for the No-Tion application.")
 public class Client implements Callable<Integer> {
 
-  /**
-   * Enum representing the list of commands supported by the client.
-   */
+  /** Enum representing the list of commands supported by the client. */
   public enum Command {
-    CONNECT,         // Connect to the server
-    DISCONNECT,      // Disconnect from the server
-    CREATE_NOTE,     // Create a new note
-    DELETE_NOTE,     // Delete an existing note
-    LIST_NOTES,      // List all notes
-    GET_NOTE,        // Retrieve a specific note by index
-    UPDATE_CONTENT,  // Update the content of a note
-    UPDATE_TITLE,    // Update the title of a note
-    HELP,            // Display help information
-    QUIT             // Quit the client
+    CONNECT, // Connect to the server
+    DISCONNECT, // Disconnect from the server
+    CREATE_NOTE, // Create a new note
+    DELETE_NOTE, // Delete an existing note
+    LIST_NOTES, // List all notes
+    GET_NOTE, // Retrieve a specific note by index
+    UPDATE_CONTENT, // Update the content of a note
+    UPDATE_TITLE, // Update the title of a note
+    HELP, // Display help information
+    QUIT // Quit the client
   }
 
   /** Tracks whether the client is connected to the server. */
@@ -37,16 +35,16 @@ public class Client implements Callable<Integer> {
 
   /** Hostname or IP address of the server. */
   @CommandLine.Option(
-          names = {"-H", "--host"},
-          description = "Address of the server (default: ${DEFAULT-VALUE}).",
-          defaultValue = "localhost")
+      names = {"-H", "--host"},
+      description = "Address of the server (default: ${DEFAULT-VALUE}).",
+      defaultValue = "localhost")
   private String host;
 
   /** Port number of the server. */
   @CommandLine.Option(
-          names = {"-p", "--port"},
-          description = "Port of the server (default: ${DEFAULT-VALUE}).",
-          defaultValue = "16447")
+      names = {"-p", "--port"},
+      description = "Port of the server (default: ${DEFAULT-VALUE}).",
+      defaultValue = "16447")
   private int port;
 
   /**
@@ -57,18 +55,19 @@ public class Client implements Callable<Integer> {
   @Override
   public Integer call() {
     try (
-            // Establish a connection to the server
-            Socket socket = new Socket(host, port);
-            // Reader to receive responses from the server
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
-            // Writer to send commands to the server
-            BufferedWriter out = new BufferedWriter(
-                    new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8));
-            // Reader to get user input from the console
-            BufferedReader userInputReader = new BufferedReader(
-                    new InputStreamReader(System.in, StandardCharsets.UTF_8))
-    ) {
+    // Establish a connection to the server
+    Socket socket = new Socket(host, port);
+        // Reader to receive responses from the server
+        BufferedReader in =
+            new BufferedReader(
+                new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
+        // Writer to send commands to the server
+        BufferedWriter out =
+            new BufferedWriter(
+                new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8));
+        // Reader to get user input from the console
+        BufferedReader userInputReader =
+            new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8))) {
       System.out.println("[Client] Connected to server " + host + ":" + port);
       System.out.println();
 
@@ -98,9 +97,9 @@ public class Client implements Callable<Integer> {
 
         // Ensure the client is connected for specific commands
         if (!connected
-                && command != Command.CONNECT
-                && command != Command.QUIT
-                && command != Command.HELP) {
+            && command != Command.CONNECT
+            && command != Command.QUIT
+            && command != Command.HELP) {
           System.out.println("You must connect first using the CONNECT command.");
           continue;
         }
@@ -193,8 +192,7 @@ public class Client implements Callable<Integer> {
             System.out.println("Exiting the client.");
             return 0;
           }
-          default ->
-                  System.out.println("Unknown command. Type HELP for the list of commands.");
+          default -> System.out.println("Unknown command. Type HELP for the list of commands.");
         }
       }
     } catch (IOException e) {
@@ -216,19 +214,22 @@ public class Client implements Callable<Integer> {
     out.flush();
   }
 
-  /**
-   * Prints the list of available commands to the console.
-   */
+  /** Prints the list of available commands to the console. */
   private void printHelp() {
     System.out.println("Available commands:");
-    System.out.println("  CONNECT <username>         - Connect to the server with the specified username.");
+    System.out.println(
+        "  CONNECT <username>         - Connect to the server with the specified username.");
     System.out.println("  DISCONNECT                 - Disconnect from the server.");
-    System.out.println("  CREATE_NOTE <title>        - Create a new note with the specified title.");
+    System.out.println(
+        "  CREATE_NOTE <title>        - Create a new note with the specified title.");
     System.out.println("  DELETE_NOTE <title>        - Delete the note with the specified title.");
     System.out.println("  LIST_NOTES                 - List all existing notes.");
-    System.out.println("  GET_NOTE <index>           - Retrieve the content of the note at the specified index.");
-    System.out.println("  UPDATE_CONTENT <index> <content> - Update the content of the note at the specified index.");
-    System.out.println("  UPDATE_TITLE <index> <title> - Update the title of the note at the specified index.");
+    System.out.println(
+        "  GET_NOTE <index>           - Retrieve the content of the note at the specified index.");
+    System.out.println(
+        "  UPDATE_CONTENT <index> <content> - Update the content of the note at the specified index.");
+    System.out.println(
+        "  UPDATE_TITLE <index> <title> - Update the title of the note at the specified index.");
     System.out.println("  HELP                       - Display this help message.");
     System.out.println("  QUIT                       - Exit the client.");
   }

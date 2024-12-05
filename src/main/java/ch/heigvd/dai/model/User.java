@@ -1,16 +1,16 @@
 package ch.heigvd.dai.model;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class User {
-  private String name;
-  private List<Note> notes;
+  private final String name;
+  private final CopyOnWriteArrayList<Note> notes;
 
   public User(String name) {
     this.name = name;
-    this.notes = new ArrayList<>();
+    this.notes = new CopyOnWriteArrayList<>();
   }
 
   public String getName() {

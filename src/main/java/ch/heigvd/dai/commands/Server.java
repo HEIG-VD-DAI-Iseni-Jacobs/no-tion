@@ -65,7 +65,8 @@ public class Server implements Callable<Integer> {
   }
 
   /**
-   * The client handler class. Handle the client connection. Each client is handled in a separate thread.
+   * The client handler class. Handle the client connection. Each client is handled in a separate
+   * thread.
    */
   static class ClientHandler implements Runnable {
     private final Socket socket;
