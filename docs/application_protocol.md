@@ -36,8 +36,10 @@ CONNECT <name>
 
 #### Réponse
 ```text
-OK
+    OK : connexion réussie
+ERROR <code> : connexion échouée
 ```
+*Codes d'erreurs : [3](#error-3)*
 
 ### Déconnexion
 Le client envoie une commande de déconnexion au serveur pour se déconnecter.
@@ -62,7 +64,9 @@ CREATE_NOTE <titre>
 #### Réponse
 ```text
 OK
+ERROR <code> : erreur lors de la création de la note
 ```
+*Codes d'erreurs : [2](#error-2), [3](#error-3)*
 
 ### Suppression d'une note
 Le client envoie une commande de suppression de note au serveur.
@@ -75,7 +79,9 @@ DELETE_NOTE <titre>
 #### Réponse
 ```text
 OK
+ERROR <code> : erreur lors de la suppression de la note
 ```
+*Codes d'erreurs : [1](#error-1), [3](#error-3)*
 
 ### Liste des notes
 Le client envoie une commande pour obtenir la liste des notes au serveur.
@@ -104,7 +110,9 @@ GET_NOTE <index>
 #### Réponse
 ```text
 NOTE <contenu>
+ERROR <code> : erreur lors de la récupération de la note
 ```
+*Codes d'erreurs : [1](#error-1), [3](#error-3)*
 
 ### Modification du contenu d'une note
 Le client envoie une commande pour modifier une note au serveur.
@@ -117,7 +125,9 @@ UPDATE_CONTENT <index> <nouveau contenu>
 #### Réponse
 ```text
 OK
+ERROR <code> : erreur lors de la modification du contenu de la note
 ```
+*Codes d'erreurs : [1](#error-1)*
 
 ### Modification du titre d'une note
 Le client envoie une commande pour modifier le titre d'une note au serveur.
@@ -130,10 +140,12 @@ UPDATE_TITLE <index> <nouveau titre>
 #### Réponse
 ```text
 OK
+ERROR <code> : erreur lors de la modification du titre de la note
 ```
+*Codes d'erreurs : [1](#error-1), [2](#error-2), [3](#error-3)*
 
 
-### Erreur
+### Erreurs
 Le serveur envoie un message d'erreur au client si une des requêtes est invalide.
 
 #### Réponse
@@ -142,9 +154,9 @@ ERROR <code>
 ```
 
 Les codes d'erreur sont les suivants :
-- -1 : not found (Note inexistante)
-- -2 : conflict (Note déjà existante)
-- -3 : syntax error (Commande inconnue ou incorrecte)
+- <a id="error-1">-1</a> : not found (Note inexistante)
+- <a id="error-2">-2</a> : conflict (Note déjà existante)
+- <a id="error-3">-3</a> : syntax error (Commande inconnue ou incorrecte, ex. connect alors que l'utilisateur est déjà connecté)
 
 ## Exemples
 

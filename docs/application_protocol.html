@@ -386,8 +386,10 @@ code {
 <pre class="hljs"><code><div>CONNECT &lt;name&gt;
 </div></code></pre>
 <h4 id="r%C3%A9ponse">Réponse</h4>
-<pre class="hljs"><code><div>OK
+<pre class="hljs"><code><div>    OK : connexion réussie
+ERROR &lt;code&gt; : connexion échouée
 </div></code></pre>
+<p><em>Codes d'erreurs : <a href="#error-3">3</a></em></p>
 <h3 id="d%C3%A9connexion">Déconnexion</h3>
 <p>Le client envoie une commande de déconnexion au serveur pour se déconnecter.</p>
 <h4 id="requ%C3%AAte">Requête</h4>
@@ -403,7 +405,9 @@ Pour simplifier le code, le client devra d'abord créer une note, puis la modifi
 </div></code></pre>
 <h4 id="r%C3%A9ponse">Réponse</h4>
 <pre class="hljs"><code><div>OK
+ERROR &lt;code&gt; : erreur lors de la création de la note
 </div></code></pre>
+<p><em>Codes d'erreurs : <a href="#error-2">2</a>, <a href="#error-3">3</a></em></p>
 <h3 id="suppression-dune-note">Suppression d'une note</h3>
 <p>Le client envoie une commande de suppression de note au serveur.</p>
 <h4 id="requ%C3%AAte">Requête</h4>
@@ -411,7 +415,9 @@ Pour simplifier le code, le client devra d'abord créer une note, puis la modifi
 </div></code></pre>
 <h4 id="r%C3%A9ponse">Réponse</h4>
 <pre class="hljs"><code><div>OK
+ERROR &lt;code&gt; : erreur lors de la suppression de la note
 </div></code></pre>
+<p><em>Codes d'erreurs : <a href="#error-1">1</a>, <a href="#error-3">3</a></em></p>
 <h3 id="liste-des-notes">Liste des notes</h3>
 <p>Le client envoie une commande pour obtenir la liste des notes au serveur.</p>
 <h4 id="requ%C3%AAte">Requête</h4>
@@ -430,7 +436,9 @@ n &lt;titre de la note n&gt;
 </div></code></pre>
 <h4 id="r%C3%A9ponse">Réponse</h4>
 <pre class="hljs"><code><div>NOTE &lt;contenu&gt;
+ERROR &lt;code&gt; : erreur lors de la récupération de la note
 </div></code></pre>
+<p><em>Codes d'erreurs : <a href="#error-1">1</a>, <a href="#error-3">3</a></em></p>
 <h3 id="modification-du-contenu-dune-note">Modification du contenu d'une note</h3>
 <p>Le client envoie une commande pour modifier une note au serveur.</p>
 <h4 id="requ%C3%AAte">Requête</h4>
@@ -438,7 +446,9 @@ n &lt;titre de la note n&gt;
 </div></code></pre>
 <h4 id="r%C3%A9ponse">Réponse</h4>
 <pre class="hljs"><code><div>OK
+ERROR &lt;code&gt; : erreur lors de la modification du contenu de la note
 </div></code></pre>
+<p><em>Codes d'erreurs : <a href="#error-1">1</a></em></p>
 <h3 id="modification-du-titre-dune-note">Modification du titre d'une note</h3>
 <p>Le client envoie une commande pour modifier le titre d'une note au serveur.</p>
 <h4 id="requ%C3%AAte">Requête</h4>
@@ -446,17 +456,19 @@ n &lt;titre de la note n&gt;
 </div></code></pre>
 <h4 id="r%C3%A9ponse">Réponse</h4>
 <pre class="hljs"><code><div>OK
+ERROR &lt;code&gt; : erreur lors de la modification du titre de la note
 </div></code></pre>
-<h3 id="erreur">Erreur</h3>
+<p><em>Codes d'erreurs : <a href="#error-1">1</a>, <a href="#error-2">2</a>, <a href="#error-3">3</a></em></p>
+<h3 id="erreurs">Erreurs</h3>
 <p>Le serveur envoie un message d'erreur au client si une des requêtes est invalide.</p>
 <h4 id="r%C3%A9ponse">Réponse</h4>
 <pre class="hljs"><code><div>ERROR &lt;code&gt;
 </div></code></pre>
 <p>Les codes d'erreur sont les suivants :</p>
 <ul>
-<li>-1 : not found (Note inexistante)</li>
-<li>-2 : conflict (Note déjà existante)</li>
-<li>-3 : syntax error (Commande inconnue ou incorrecte)</li>
+<li><a id="error-1">-1</a> : not found (Note inexistante)</li>
+<li><a id="error-2">-2</a> : conflict (Note déjà existante)</li>
+<li><a id="error-3">-3</a> : syntax error (Commande inconnue ou incorrecte, ex. connect alors que l'utilisateur est déjà connecté)</li>
 </ul>
 <h2 id="exemples">Exemples</h2>
 <h3 id="exemple-pour-la-cr%C3%A9ation-dune-note">Exemple pour la création d'une note</h3>
