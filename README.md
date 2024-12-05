@@ -24,3 +24,24 @@ TODO : add nocache when building docker with date
 
 add authorisations build.sh:
 chmod +x build.sh
+
+Build: use run config `Package application as JAR file`
+
+Run server on docker :
+```bash
+docker run -p 16447:16447 ghcr.io/heig-vd-dai-iseni-jacobs/no-tion server
+```
+
+Or locally: run config `Run the server`
+
+Run client locally : 
+```bash
+java -jar target/no-tion-1.0-SNAPSHOT.jar.jar client
+```
+
+(or use run config `Run a client`)
+
+Restart docker (notamment pour clenaup ports) :
+```bash
+sudo service docker restart
+```
