@@ -37,7 +37,6 @@ Open your terminal and run the following command to clone the repository:
 ```bash
 git clone git@github.com:HEIG-VD-DAI-Iseni-Jacobs/no-tion.git
 ```
-</details>
 
 ### Build and run
 
